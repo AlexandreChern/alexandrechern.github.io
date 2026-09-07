@@ -1,0 +1,41 @@
+name: Build deployment branch
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deployment-branch
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Install Jekyll
+        run: gem install jekyll -v 4.3.4 jekyll-theme-cayman -v 0.2.0
+
+      - name: Build website
+        env:
+          JEKYLL_ENV: production
+        run: jekyll build
+
+      - name: Publish generated website
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: deploy
+          publish_dir: ./_site
