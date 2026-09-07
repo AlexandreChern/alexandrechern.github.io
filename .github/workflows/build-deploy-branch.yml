@@ -26,7 +26,7 @@ jobs:
           ruby-version: "3.3"
 
       - name: Install Jekyll
-        run: gem install jekyll -v 4.3.4 jekyll-theme-cayman -v 0.2.0
+        run: gem install "jekyll:4.3.4" "jekyll-theme-cayman:0.2.0"
 
       - name: Build website
         env:
