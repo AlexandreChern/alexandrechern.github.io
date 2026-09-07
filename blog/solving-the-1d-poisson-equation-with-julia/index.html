@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="A compact finite-difference example that verifies second-order convergence and demonstrates the blog&#39;s Markdown support." />
+    <title>Solving the 1D Poisson Equation with Julia | Alexandre Chern</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" />
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="/assets/css/templatemo-style.css" />
+    
+      <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [["$", "$"], ["\\(", "\\)"]]
+          }
+        };
+      </script>
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+  </head>
+  <body class="content-page">
+    <div id="page-wraper">
+      <div class="responsive-nav">
+  <i class="fa fa-bars" id="menu-toggle" aria-label="Open navigation"></i>
+  <div id="menu" class="menu">
+    <i class="fa fa-times" id="menu-close" aria-label="Close navigation"></i>
+    <div class="container">
+      <div class="image">
+        <a href="/">
+          <img src="/assets/images/alexandre_chern.jpg" alt="Alexandre Chern" />
+        </a>
+      </div>
+      <div class="author-content">
+        <h4>Alexandre Chern</h4>
+        <span>PhD in Computer Science <br /> Computational Scientist</span>
+      </div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul class="main-menu">
+          <li><a href="/#section1">About Me</a></li>
+          <li><a href="/#section2">Research Interests</a></li>
+          <li><a href="/#section3">My Work</a></li>
+          <li class="active">
+            <a href="/blog/">Blog</a>
+          </li>
+          <li><a href="/#section4">Contact Me</a></li>
+        </ul>
+      </nav>
+      <div class="social-network">
+        <ul class="soial-icons">
+          <li><a href="https://www.facebook.com/ymchern" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/alexandre-c-81a31490/" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a></li>
+          <li><a href="https://www.instagram.com/ym.chern/" aria-label="Instagram"><i class="fa fa-instagram"></i></a></li>
+        </ul>
+      </div>
+      <div class="copyright-text"><p>Copyright 2026 Alexandre Chern</p></div>
+    </div>
+  </div>
+</div>
+      <main class="section content-section">
+        <div class="container">
+          <article class="blog-post">
+  <a class="blog-back" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
+  <header class="post-header">
+    <p class="post-date">September 7, 2026</p>
+    <h1>Solving the 1D Poisson Equation with Julia</h1>
+    <p class="post-description">A compact finite-difference example that verifies second-order convergence and demonstrates the blog's Markdown support.</p>
+    
+      <div class="post-tags" aria-label="Tags">
+        
+          <a href="/blog/#julia">Julia</a>
+        
+          <a href="/blog/#numerical-methods">Numerical Methods</a>
+        
+          <a href="/blog/#pdes">PDEs</a>
+        
+      </div>
+    
+  </header>
+  <div class="post-content">
+    <p>This sample post solves a familiar boundary-value problem with a <strong>second-order finite-difference method</strong>. It also exercises the blog’s Markdown support: equations, Julia syntax highlighting, tables, blockquotes, lists, links, and inline <code class="language-plaintext highlighter-rouge">code</code>.</p>
+
+<h2 id="the-model-problem">The model problem</h2>
+
+<p>Consider the one-dimensional Poisson equation</p>
+
+\[-u''(x) = \pi^2 \sin(\pi x), \qquad x \in (0,1),\]
+
+<p>with homogeneous Dirichlet boundary conditions $u(0)=u(1)=0$. The exact solution is</p>
+
+\[u(x) = \sin(\pi x).\]
+
+<p>On a uniform grid with spacing $h$, the centered approximation is</p>
+
+\[-u''(x_i) \approx \frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2}.\]
+
+<blockquote>
+  <p>Because the truncation error is $O(h^2)$, halving the grid spacing should reduce the error by approximately a factor of four.</p>
+</blockquote>
+
+<h2 id="julia-implementation">Julia implementation</h2>
+
+<p>The matrix is symmetric and tridiagonal, so Julia’s <a href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#LinearAlgebra.SymTridiagonal"><code class="language-plaintext highlighter-rouge">SymTridiagonal</code></a> type stores and solves the system efficiently.</p>
+
+<div class="language-julia highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="n">LinearAlgebra</span>
+
+<span class="k">function</span><span class="nf"> solve_poisson_1d</span><span class="x">(</span><span class="n">interior_points</span><span class="x">)</span>
+    <span class="n">grid_spacing</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="x">(</span><span class="n">interior_points</span> <span class="o">+</span> <span class="mi">1</span><span class="x">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">collect</span><span class="x">(</span><span class="n">range</span><span class="x">(</span>
+        <span class="n">grid_spacing</span><span class="x">,</span>
+        <span class="mi">1</span> <span class="o">-</span> <span class="n">grid_spacing</span><span class="x">;</span>
+        <span class="n">length</span><span class="o">=</span><span class="n">interior_points</span><span class="x">,</span>
+    <span class="x">))</span>
+
+    <span class="n">operator</span> <span class="o">=</span> <span class="kt">SymTridiagonal</span><span class="x">(</span>
+        <span class="n">fill</span><span class="x">(</span><span class="mi">2</span> <span class="o">/</span> <span class="n">grid_spacing</span><span class="o">^</span><span class="mi">2</span><span class="x">,</span> <span class="n">interior_points</span><span class="x">),</span>
+        <span class="n">fill</span><span class="x">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">grid_spacing</span><span class="o">^</span><span class="mi">2</span><span class="x">,</span> <span class="n">interior_points</span> <span class="o">-</span> <span class="mi">1</span><span class="x">),</span>
+    <span class="x">)</span>
+    <span class="n">right_hand_side</span> <span class="o">=</span> <span class="nb">pi</span><span class="o">^</span><span class="mi">2</span> <span class="o">.*</span> <span class="n">sin</span><span class="o">.</span><span class="x">(</span><span class="nb">pi</span> <span class="o">.*</span> <span class="n">x</span><span class="x">)</span>
+    <span class="n">numerical_solution</span> <span class="o">=</span> <span class="n">operator</span> <span class="o">\</span> <span class="n">right_hand_side</span>
+    <span class="n">exact_solution</span> <span class="o">=</span> <span class="n">sin</span><span class="o">.</span><span class="x">(</span><span class="nb">pi</span> <span class="o">.*</span> <span class="n">x</span><span class="x">)</span>
+
+    <span class="k">return</span> <span class="n">maximum</span><span class="x">(</span><span class="n">abs</span><span class="o">.</span><span class="x">(</span><span class="n">numerical_solution</span> <span class="o">.-</span> <span class="n">exact_solution</span><span class="x">))</span>
+<span class="k">end</span>
+
+<span class="k">for</span> <span class="n">interior_points</span> <span class="k">in</span> <span class="x">(</span><span class="mi">32</span><span class="x">,</span> <span class="mi">64</span><span class="x">,</span> <span class="mi">128</span><span class="x">,</span> <span class="mi">256</span><span class="x">)</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">solve_poisson_1d</span><span class="x">(</span><span class="n">interior_points</span><span class="x">)</span>
+    <span class="n">println</span><span class="x">(</span><span class="s">"n = </span><span class="si">$</span><span class="s">interior_points, max error = </span><span class="si">$</span><span class="s">error"</span><span class="x">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The code uses only Julia’s standard library. A run with Julia produced:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>n = 32,  max error = 7.547363359678982e-4
+n = 64,  max error = 1.9463264608221564e-4
+n = 128, max error = 4.9421936692550794e-5
+n = 256, max error = 1.2452237266202815e-5
+</code></pre></div></div>
+
+<h2 id="convergence-results">Convergence results</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right">Interior points</th>
+      <th style="text-align: right">Maximum error</th>
+      <th style="text-align: right">Observed order</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right">32</td>
+      <td style="text-align: right">$7.55 \times 10^{-4}$</td>
+      <td style="text-align: right">-</td>
+    </tr>
+    <tr>
+      <td style="text-align: right">64</td>
+      <td style="text-align: right">$1.95 \times 10^{-4}$</td>
+      <td style="text-align: right">1.96</td>
+    </tr>
+    <tr>
+      <td style="text-align: right">128</td>
+      <td style="text-align: right">$4.94 \times 10^{-5}$</td>
+      <td style="text-align: right">1.98</td>
+    </tr>
+    <tr>
+      <td style="text-align: right">256</td>
+      <td style="text-align: right">$1.25 \times 10^{-5}$</td>
+      <td style="text-align: right">1.99</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The observed order approaches two, which is the expected behavior. This gives us three quick checks:</p>
+
+<ol>
+  <li>The boundary conditions are represented by excluding the two boundary points from the unknowns.</li>
+  <li>The numerical solution converges to the known analytical solution.</li>
+  <li>The convergence rate agrees with the stencil’s $O(h^2)$ truncation error.</li>
+</ol>
+
+<hr />
+
+<p>This is a deliberately small example, but the same workflow scales to more interesting operators: define the discretization, exploit its structure, and verify it against a result you know. Browse the <a href="/blog/#julia">Julia tag</a> for related posts.<sup id="fnref:source"><a href="#fn:source" class="footnote" rel="footnote" role="doc-noteref">1</a></sup></p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:source">
+      <p>The numerical output in this post was generated by running the included code with Julia. <a href="#fnref:source" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  </div>
+  <nav class="post-navigation" aria-label="Post navigation">
+    
+    
+  </nav>
+</article>
+        </div>
+      </main>
+    </div>
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      (function () {
+        var menu = document.getElementById("menu");
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+          menu.classList.add("open");
+        });
+        document.getElementById("menu-close").addEventListener("click", function () {
+          menu.classList.remove("open");
+        });
+      })();
+    </script>
+  </body>
+</html>

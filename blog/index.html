@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Notes on computational science, numerical methods, and high-performance computing." />
+    <title>Technical Blog | Alexandre Chern</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" />
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="/assets/css/templatemo-style.css" />
+    
+  </head>
+  <body class="content-page">
+    <div id="page-wraper">
+      <div class="responsive-nav">
+  <i class="fa fa-bars" id="menu-toggle" aria-label="Open navigation"></i>
+  <div id="menu" class="menu">
+    <i class="fa fa-times" id="menu-close" aria-label="Close navigation"></i>
+    <div class="container">
+      <div class="image">
+        <a href="/">
+          <img src="/assets/images/alexandre_chern.jpg" alt="Alexandre Chern" />
+        </a>
+      </div>
+      <div class="author-content">
+        <h4>Alexandre Chern</h4>
+        <span>PhD in Computer Science <br /> Computational Scientist</span>
+      </div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul class="main-menu">
+          <li><a href="/#section1">About Me</a></li>
+          <li><a href="/#section2">Research Interests</a></li>
+          <li><a href="/#section3">My Work</a></li>
+          <li class="active">
+            <a href="/blog/">Blog</a>
+          </li>
+          <li><a href="/#section4">Contact Me</a></li>
+        </ul>
+      </nav>
+      <div class="social-network">
+        <ul class="soial-icons">
+          <li><a href="https://www.facebook.com/ymchern" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/alexandre-c-81a31490/" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a></li>
+          <li><a href="https://www.instagram.com/ym.chern/" aria-label="Instagram"><i class="fa fa-instagram"></i></a></li>
+        </ul>
+      </div>
+      <div class="copyright-text"><p>Copyright 2026 Alexandre Chern</p></div>
+    </div>
+  </div>
+</div>
+      <main class="section content-section">
+        <div class="container">
+          <header class="blog-heading">
+  <p class="blog-kicker">Technical notes</p>
+  <h1>Ideas, methods, and experiments</h1>
+  <p>Writing about computational mathematics, numerical PDEs, and high-performance computing.</p>
+</header>
+
+
+  <div class="tag-filter" aria-label="Filter posts by tag">
+    <button class="tag-button active" type="button" data-tag="all" aria-pressed="true">All <span>1</span></button>
+    
+    
+      <button class="tag-button" type="button" data-tag="julia" aria-pressed="false">Julia <span>1</span></button>
+    
+      <button class="tag-button" type="button" data-tag="numerical-methods" aria-pressed="false">Numerical Methods <span>1</span></button>
+    
+      <button class="tag-button" type="button" data-tag="pdes" aria-pressed="false">PDEs <span>1</span></button>
+    
+  </div>
+
+  <div class="post-list" id="post-list">
+    
+      <article class="post-preview" data-tags="julianumerical-methodspdes">
+        <p class="post-date">September 7, 2026</p>
+        <h2><a href="/blog/solving-the-1d-poisson-equation-with-julia/">Solving the 1D Poisson Equation with Julia</a></h2>
+        <p>A compact finite-difference example that verifies second-order convergence and demonstrates the blog's Markdown support.</p>
+        
+          <div class="post-tags" aria-label="Tags">
+            <button type="button" data-tag="julia">Julia</button><button type="button" data-tag="numerical-methods">Numerical Methods</button><button type="button" data-tag="pdes">PDEs</button>
+          </div>
+        
+        <a class="read-post" href="/blog/solving-the-1d-poisson-equation-with-julia/">Read article <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+      </article>
+    
+  </div>
+  <p class="no-tag-results" id="no-tag-results" hidden>No posts use this tag yet.</p>
+
+
+<script>
+  (function () {
+    var filters = document.querySelectorAll("[data-tag]");
+    var posts = document.querySelectorAll(".post-preview");
+    var emptyMessage = document.getElementById("no-tag-results");
+
+    function selectTag(tag) {
+      var visibleCount = 0;
+      document.querySelectorAll(".tag-button").forEach(function (button) {
+        var selected = button.dataset.tag === tag;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", selected.toString());
+      });
+      posts.forEach(function (post) {
+        var visible = tag === "all" || post.dataset.tags.split(" ").indexOf(tag) !== -1;
+        post.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      if (emptyMessage) emptyMessage.hidden = visibleCount !== 0;
+    }
+
+    filters.forEach(function (filter) {
+      filter.addEventListener("click", function () {
+        var tag = filter.dataset.tag;
+        window.location.hash = tag === "all" ? "" : tag;
+        selectTag(tag);
+      });
+    });
+
+    var initialTag = window.location.hash.slice(1);
+    var knownTag = Array.prototype.some.call(document.querySelectorAll(".tag-button"), function (button) {
+      return button.dataset.tag === initialTag;
+    });
+    selectTag(initialTag && knownTag ? initialTag : "all");
+  })();
+</script>
+        </div>
+      </main>
+    </div>
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      (function () {
+        var menu = document.getElementById("menu");
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+          menu.classList.add("open");
+        });
+        document.getElementById("menu-close").addEventListener("click", function () {
+          menu.classList.remove("open");
+        });
+      })();
+    </script>
+  </body>
+</html>
