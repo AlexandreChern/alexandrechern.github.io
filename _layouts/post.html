@@ -1,0 +1,25 @@
+---
+layout: content
+---
+<article class="blog-post">
+  <a class="blog-back" href="{{ '/blog/' | relative_url }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
+  <header class="post-header">
+    <p class="post-date">{{ page.date | date: "%B %-d, %Y" }}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.description %}<p class="post-description">{{ page.description }}</p>{% endif %}
+    {% if page.tags.size > 0 %}
+      <div class="post-tags" aria-label="Tags">
+        {% for tag in page.tags %}
+          <a href="{{ '/blog/' | relative_url }}#{{ tag | slugify }}">{{ tag }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </header>
+  <div class="post-content">
+    {{ content }}
+  </div>
+  <nav class="post-navigation" aria-label="Post navigation">
+    {% if page.previous %}<a href="{{ page.previous.url | relative_url }}"><span>Previous</span>{{ page.previous.title }}</a>{% endif %}
+    {% if page.next %}<a href="{{ page.next.url | relative_url }}"><span>Next</span>{{ page.next.title }}</a>{% endif %}
+  </nav>
+</article>

@@ -1,1 +1,6 @@
+title: Alexandre Chern
+description: Computational science, numerical methods, and high-performance computing
 theme: jekyll-theme-cayman
+permalink: /blog/:title/
+markdown: kramdown
+highlighter: rouge

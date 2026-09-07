@@ -1,0 +1,80 @@
+---
+layout: content
+title: Technical Blog
+description: Notes on computational science, numerical methods, and high-performance computing.
+permalink: /blog/
+---
+<header class="blog-heading">
+  <p class="blog-kicker">Technical notes</p>
+  <h1>Ideas, methods, and experiments</h1>
+  <p>Writing about computational mathematics, numerical PDEs, and high-performance computing.</p>
+</header>
+
+{% if site.posts.size > 0 %}
+  <div class="tag-filter" aria-label="Filter posts by tag">
+    <button class="tag-button active" type="button" data-tag="all" aria-pressed="true">All <span>{{ site.posts.size }}</span></button>
+    {% assign sorted_tags = site.tags | sort %}
+    {% for tag in sorted_tags %}
+      <button class="tag-button" type="button" data-tag="{{ tag[0] | slugify }}" aria-pressed="false">{{ tag[0] }} <span>{{ tag[1].size }}</span></button>
+    {% endfor %}
+  </div>
+
+  <div class="post-list" id="post-list">
+    {% for post in site.posts %}
+      <article class="post-preview" data-tags="{% for tag in post.tags %}{{ tag | slugify }}{% unless forloop.last %} {% endunless %}{% endfor %}">
+        <p class="post-date">{{ post.date | date: "%B %-d, %Y" }}</p>
+        <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+        <p>{{ post.description | default: post.excerpt | strip_html | truncatewords: 32 }}</p>
+        {% if post.tags.size > 0 %}
+          <div class="post-tags" aria-label="Tags">
+            {% for tag in post.tags %}<button type="button" data-tag="{{ tag | slugify }}">{{ tag }}</button>{% endfor %}
+          </div>
+        {% endif %}
+        <a class="read-post" href="{{ post.url | relative_url }}">Read article <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="no-tag-results" id="no-tag-results" hidden>No posts use this tag yet.</p>
+{% else %}
+  <div class="empty-blog">
+    <h2>First article coming soon</h2>
+    <p>Technical notes will appear here as they are published.</p>
+  </div>
+{% endif %}
+
+<script>
+  (function () {
+    var filters = document.querySelectorAll("[data-tag]");
+    var posts = document.querySelectorAll(".post-preview");
+    var emptyMessage = document.getElementById("no-tag-results");
+
+    function selectTag(tag) {
+      var visibleCount = 0;
+      document.querySelectorAll(".tag-button").forEach(function (button) {
+        var selected = button.dataset.tag === tag;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", selected.toString());
+      });
+      posts.forEach(function (post) {
+        var visible = tag === "all" || post.dataset.tags.split(" ").indexOf(tag) !== -1;
+        post.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      if (emptyMessage) emptyMessage.hidden = visibleCount !== 0;
+    }
+
+    filters.forEach(function (filter) {
+      filter.addEventListener("click", function () {
+        var tag = filter.dataset.tag;
+        window.location.hash = tag === "all" ? "" : tag;
+        selectTag(tag);
+      });
+    });
+
+    var initialTag = window.location.hash.slice(1);
+    var knownTag = Array.prototype.some.call(document.querySelectorAll(".tag-button"), function (button) {
+      return button.dataset.tag === initialTag;
+    });
+    selectTag(initialTag && knownTag ? initialTag : "all");
+  })();
+</script>

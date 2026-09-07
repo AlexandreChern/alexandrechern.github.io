@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -41,14 +43,15 @@ https://templatemo.com/tm-531-reflux
             </div>
             <div class="author-content">
               <h4>Alexandre Chern</h4>
-              <span>PhD Student in Computer Science</span>
+              <span>PhD in Computer Science <br> Computational Scientist</span>
             </div>
             <nav class="main-nav" role="navigation">
               <ul class="main-menu">
                 <li><a href="#section1">About Me</a></li>
                 <li><a href="#section2">Research Interests</a></li>
                 <li><a href="#section3">My Work</a></li>
-                <li><a href="#section4">Contact Me</a></li>
+                <li><a href="#section4">Blog</a></li>
+                <li><a href="#section5">Contact Me</a></li>
               </ul>
             </nav>
             <div class="social-network">
@@ -180,7 +183,44 @@ https://templatemo.com/tm-531-reflux
         </div>
       </section>
 
-      <section class="section contact-me" data-section="section4">
+      <section class="section home-blog" data-section="section4">
+        <div class="container">
+          <div class="section-heading">
+            <h2>Technical Blog</h2>
+            <div class="line-dec"></div>
+            <span>Notes on computational science, numerical methods, and high-performance computing.</span>
+          </div>
+          {% if site.posts.size > 0 %}
+            <div class="home-blog-list">
+              {% for post in site.posts %}
+                <article class="post-preview">
+                  <p class="post-date">{{ post.date | date: "%B %-d, %Y" }}</p>
+                  <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+                  <p>{{ post.description | default: post.excerpt | strip_html | truncatewords: 32 }}</p>
+                  {% if post.tags.size > 0 %}
+                    <div class="post-tags" aria-label="Tags">
+                      {% for tag in post.tags %}
+                        <a href="{{ '/blog/' | relative_url }}#{{ tag | slugify }}">{{ tag }}</a>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <a class="read-post" href="{{ post.url | relative_url }}">Read article <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                </article>
+              {% endfor %}
+            </div>
+            <div class="white-button blog-archive-link">
+              <a href="{{ '/blog/' | relative_url }}">Browse by tag</a>
+            </div>
+          {% else %}
+            <div class="empty-blog">
+              <h4>First article coming soon</h4>
+              <p>Technical notes will appear here as they are published.</p>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="section contact-me" data-section="section5">
         <div class="container">
           <div class="section-heading">
             <h2>Contact Info</h2>
@@ -262,7 +302,7 @@ https://templatemo.com/tm-531-reflux
         });
       };
 
-      $(".main-menu").on("click", "a", function(e) {
+      $(".main-menu").on("click", 'a[href^="#"]', function(e) {
         e.preventDefault();
         showSection($(this).attr("href"), true);
       });

@@ -1,0 +1,29 @@
+# macOS filesystem metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# macOS thumbnail and resource fork files
+._*
+
+# Files that may appear at the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories created on remote AFP shares
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Jekyll build artifacts
+_site/
+.jekyll-cache/
+.jekyll-metadata
