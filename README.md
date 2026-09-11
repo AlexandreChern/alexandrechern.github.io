@@ -10,7 +10,7 @@ Run the Jekyll development server from the project directory:
 ./preview.sh
 ```
 
-The site is available at `http://127.0.0.1:4000`. To use a different port, pass it as an argument, for example `./preview.sh 4001`.
+The site is available at `http://127.0.0.1:4001`. To use a different port, pass it as an argument, for example `./preview.sh 4002`.
 
 ## Publishing a blog post
 
