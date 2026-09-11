@@ -2,6 +2,16 @@
 
 This is Alexandre's Homepage
 
+## Local preview
+
+Run the Jekyll development server from the project directory:
+
+```sh
+./preview.sh
+```
+
+The site is available at `http://127.0.0.1:4000`. To use a different port, pass it as an argument, for example `./preview.sh 4001`.
+
 ## Publishing a blog post
 
 1. Add a Markdown file to `_posts` named `YYYY-MM-DD-post-title.md`.
