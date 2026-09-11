@@ -44,19 +44,20 @@ a {
   align-items: center;
   display: flex;
   font-weight: 600;
-  gap: 10px;
+  gap: 12px;
 }
 
 .wordmark-mark {
-  align-items: center;
-  background: var(--ink);
-  color: var(--paper);
-  display: inline-flex;
+  flex: 0 0 auto;
+  height: 34px;
+  object-fit: cover;
+  width: 34px;
+}
+
+.wordmark-label {
   font-family: "Manrope", sans-serif;
-  font-size: 11px;
-  height: 30px;
-  justify-content: center;
-  width: 30px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .site-navigation {
@@ -349,6 +350,19 @@ a {
 
   .site-header {
     height: 64px;
+  }
+
+  .wordmark {
+    gap: 9px;
+  }
+
+  .wordmark-mark {
+    height: 30px;
+    width: 30px;
+  }
+
+  .wordmark-label {
+    font-size: 12px;
   }
 
   .menu-button {
