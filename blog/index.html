@@ -29,13 +29,13 @@
       </div>
       <nav class="main-nav" aria-label="Main navigation">
         <ul class="main-menu">
-          <li><a href="/#section1">About Me</a></li>
-          <li><a href="/#section2">Research Interests</a></li>
-          <li><a href="/#section3">My Work</a></li>
+          <li><a href="/about/#section1">About Me</a></li>
+          <li><a href="/about/#section2">Research Interests</a></li>
+          <li><a href="/about/#section3">My Work</a></li>
           <li class="active">
             <a href="/blog/">Blog</a>
           </li>
-          <li><a href="/#section4">Contact Me</a></li>
+          <li><a href="/about/#section5">Contact Me</a></li>
         </ul>
       </nav>
       <div class="social-network">
@@ -72,7 +72,7 @@
 
   <div class="post-list" id="post-list">
     
-      <article class="post-preview" data-tags="julianumerical-methodspdes">
+      <article class="post-preview" data-tags=",julia,numerical-methods,pdes,">
         <p class="post-date">September 7, 2026</p>
         <h2><a href="/blog/solving-the-1d-poisson-equation-with-julia/">Solving the 1D Poisson Equation with Julia</a></h2>
         <p>A compact finite-difference example that verifies second-order convergence and demonstrates the blog's Markdown support.</p>
@@ -102,7 +102,7 @@
         button.setAttribute("aria-pressed", selected.toString());
       });
       posts.forEach(function (post) {
-        var visible = tag === "all" || post.dataset.tags.split(" ").indexOf(tag) !== -1;
+        var visible = tag === "all" || post.dataset.tags.indexOf("," + tag + ",") !== -1;
         post.hidden = !visible;
         if (visible) visibleCount += 1;
       });
@@ -117,11 +117,16 @@
       });
     });
 
-    var initialTag = window.location.hash.slice(1);
-    var knownTag = Array.prototype.some.call(document.querySelectorAll(".tag-button"), function (button) {
-      return button.dataset.tag === initialTag;
-    });
-    selectTag(initialTag && knownTag ? initialTag : "all");
+    function selectHashTag() {
+      var hashTag = window.location.hash.slice(1);
+      var knownTag = Array.prototype.some.call(document.querySelectorAll(".tag-button"), function (button) {
+        return button.dataset.tag === hashTag;
+      });
+      selectTag(hashTag && knownTag ? hashTag : "all");
+    }
+
+    window.addEventListener("hashchange", selectHashTag);
+    selectHashTag();
   })();
 </script>
         </div>
