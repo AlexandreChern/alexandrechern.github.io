@@ -1,0 +1,44 @@
+---
+layout: content
+title: Research Datasets
+description: Versioned research datasets, software artifacts, and reproducibility packages.
+permalink: /datasets/
+---
+<header class="blog-heading">
+  <p class="blog-kicker">Open research</p>
+  <h1>Datasets and artifacts</h1>
+  <p>Versioned downloads for computational experiments, with checksums and archival references where available.</p>
+</header>
+
+{% if site.data.datasets.size > 0 %}
+  <div class="dataset-list">
+    {% for dataset in site.data.datasets %}
+      <article class="dataset-entry">
+        <p class="dataset-version">Version {{ dataset.version }}{% if dataset.published %} · {{ dataset.published | date: "%B %-d, %Y" }}{% endif %}</p>
+        <h2>{{ dataset.title }}</h2>
+        <p>{{ dataset.description }}</p>
+        <dl class="dataset-metadata">
+          {% if dataset.license %}<div><dt>License</dt><dd>{{ dataset.license }}</dd></div>{% endif %}
+          {% if dataset.doi %}<div><dt>DOI</dt><dd>{{ dataset.doi }}</dd></div>{% endif %}
+        </dl>
+        <ul class="dataset-files">
+          {% for file in dataset.files %}
+            <li>
+              <div>
+                <a class="dataset-download" href="{{ file.url }}">{{ file.name }} <i class="fa fa-download" aria-hidden="true"></i></a>
+                <span>{{ file.format }}{% if file.size %} · {{ file.size }}{% endif %}</span>
+              </div>
+              {% if file.sha256 %}<code title="SHA-256 checksum">{{ file.sha256 }}</code>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        {% if dataset.doi_url %}<a class="dataset-citation" href="{{ dataset.doi_url }}">Citation and archived copy <i class="fa fa-external-link" aria-hidden="true"></i></a>{% endif %}
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-blog">
+    <h2>No public datasets yet</h2>
+    <p>Published datasets and reproducibility packages will appear here.</p>
+  </div>
+{% endif %}

@@ -20,6 +20,9 @@
           <li{% if page.url == '/blog/' or page.layout == 'post' %} class="active"{% endif %}>
             <a href="{{ '/blog/' | relative_url }}">Blog</a>
           </li>
+          <li{% if page.url == '/datasets/' %} class="active"{% endif %}>
+            <a href="{{ '/datasets/' | relative_url }}">Datasets</a>
+          </li>
           <li><a href="{{ '/about/#section5' | relative_url }}">Contact Me</a></li>
         </ul>
       </nav>
