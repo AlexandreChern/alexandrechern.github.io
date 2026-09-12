@@ -4,3 +4,10 @@ theme: jekyll-theme-cayman
 permalink: /blog/:title/
 markdown: kramdown
 highlighter: rouge
+
+giscus:
+  enabled: true
+  repo: AlexandreChern/alexandrechern.github.io
+  repo_id: "MDEwOlJlcG9zaXRvcnkyMTE0MTMwMjM="
+  category: Announcements
+  category_id: "DIC_kwDODJnoH84DFbP4"
