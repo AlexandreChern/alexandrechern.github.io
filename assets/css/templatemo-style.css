@@ -963,6 +963,88 @@ section.contact-me {
     padding: 45px 0;
 }
 
+.dataset-list {
+    max-width: 820px;
+}
+
+.dataset-entry {
+    padding: 38px 0;
+    border-bottom: 1px solid rgba(250, 250, 250, 0.35);
+}
+
+.dataset-entry h2 {
+    margin: 8px 0 12px;
+    color: #fff;
+    font-size: 30px;
+}
+
+.dataset-version {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dataset-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 35px;
+    margin: 24px 0;
+}
+
+.dataset-metadata div {
+    display: flex;
+    gap: 8px;
+}
+
+.dataset-metadata dt {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.dataset-metadata dd {
+    margin: 0;
+    color: #fff;
+}
+
+.dataset-files {
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+}
+
+.dataset-files li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.8fr);
+    gap: 20px;
+    padding: 15px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dataset-files span {
+    display: block;
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13px;
+}
+
+.dataset-files code {
+    overflow-wrap: anywhere;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+}
+
+.dataset-download,
+.dataset-citation {
+    color: #fff;
+    font-weight: 700;
+}
+
+.dataset-download i,
+.dataset-citation i {
+    margin-left: 6px;
+}
+
 .blog-post {
     max-width: 780px;
     padding: 30px 0 80px;
@@ -1174,5 +1256,10 @@ section.contact-me {
     .post-content table {
         display: block;
         overflow-x: auto;
+    }
+
+    .dataset-files li {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 }
