@@ -62,18 +62,36 @@
 
 
   <div class="tag-filter" aria-label="Filter posts by tag">
-    <button class="tag-button active" type="button" data-tag="all" aria-pressed="true">All <span>1</span></button>
+    <button class="tag-button active" type="button" data-tag="all" aria-pressed="true">All <span>2</span></button>
     
+    
+      <button class="tag-button" type="button" data-tag="gpu-computing" aria-pressed="false">GPU Computing <span>1</span></button>
     
       <button class="tag-button" type="button" data-tag="julia" aria-pressed="false">Julia <span>1</span></button>
     
-      <button class="tag-button" type="button" data-tag="numerical-methods" aria-pressed="false">Numerical Methods <span>1</span></button>
+      <button class="tag-button" type="button" data-tag="numerical-methods" aria-pressed="false">Numerical Methods <span>2</span></button>
     
       <button class="tag-button" type="button" data-tag="pdes" aria-pressed="false">PDEs <span>1</span></button>
+    
+      <button class="tag-button" type="button" data-tag="sbp-sat" aria-pressed="false">SBP-SAT <span>1</span></button>
+    
+      <button class="tag-button" type="button" data-tag="triton" aria-pressed="false">Triton <span>1</span></button>
     
   </div>
 
   <div class="post-list" id="post-list">
+    
+      <article class="post-preview" data-tags=",triton,sbp-sat,gpu-computing,numerical-methods,">
+        <p class="post-date">September 14, 2026</p>
+        <h2><a href="/blog/porting-sbp-sat-kernels-to-triton/">Porting 2-D SBP-SAT Operators to Triton</a></h2>
+        <p>A practical look at translating a variable-coefficient SBP-SAT operator into race-free Triton kernels and measuring its scaling on an NVIDIA Tesla T4.</p>
+        
+          <div class="post-tags" aria-label="Tags">
+            <button type="button" data-tag="triton">Triton</button><button type="button" data-tag="sbp-sat">SBP-SAT</button><button type="button" data-tag="gpu-computing">GPU Computing</button><button type="button" data-tag="numerical-methods">Numerical Methods</button>
+          </div>
+        
+        <a class="read-post" href="/blog/porting-sbp-sat-kernels-to-triton/">Read article <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+      </article>
     
       <article class="post-preview" data-tags=",julia,numerical-methods,pdes,">
         <p class="post-date">September 7, 2026</p>
