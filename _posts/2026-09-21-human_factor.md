@@ -1,4 +1,16 @@
-# Human / expert factors in AI-assisted development of `etdfwi-ss`
+---
+layout: post
+title: "Human factors in AI-assisted development"
+description: "Human factors in AI-assisted development"
+permalink: /blog/human-factors/
+tags:
+  - Agentic AI
+  - Compiler
+  - Numerical Algorithms
+math: true
+---
+
+# Human / expert factors in AI-assisted development
 
 This document records the specific contributions a **domain expert** (seismic
 imaging / FWI) made while co-developing the SBP-SAT elastic FWI code in this
