@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Human factors in AI-assisted development" />
+    <title>Human factors in AI-assisted development | Alexandre Chern</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" />
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="/assets/css/templatemo-style.css" />
+    
+      <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [["$", "$"], ["\\(", "\\)"]]
+          }
+        };
+      </script>
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+  </head>
+  <body class="content-page">
+    <div id="page-wraper">
+      <div class="responsive-nav">
+  <i class="fa fa-bars" id="menu-toggle" aria-label="Open navigation"></i>
+  <div id="menu" class="menu">
+    <i class="fa fa-times" id="menu-close" aria-label="Close navigation"></i>
+    <div class="container">
+      <div class="image">
+        <a href="/">
+          <img src="/assets/images/alexandre_chern.jpg" alt="Alexandre Chern" />
+        </a>
+      </div>
+      <div class="author-content">
+        <h4>Alexandre Chern</h4>
+        <span>PhD in Computer Science <br /> Computational Scientist</span>
+      </div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul class="main-menu">
+          <li><a href="/about/#section1">About Me</a></li>
+          <li><a href="/about/#section2">Research Interests</a></li>
+          <li><a href="/about/#section3">My Work</a></li>
+          <li class="active">
+            <a href="/blog/">Blog</a>
+          </li>
+          <li>
+            <a href="/datasets/">Datasets</a>
+          </li>
+          <li><a href="/about/#section5">Contact Me</a></li>
+        </ul>
+      </nav>
+      <div class="social-network">
+        <ul class="soial-icons">
+          <li><a href="https://www.facebook.com/ymchern" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/alexandre-c-81a31490/" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a></li>
+          <li><a href="https://www.instagram.com/ym.chern/" aria-label="Instagram"><i class="fa fa-instagram"></i></a></li>
+        </ul>
+      </div>
+      <div class="copyright-text"><p>Copyright 2026 Alexandre Chern</p></div>
+    </div>
+  </div>
+</div>
+      <main class="section content-section">
+        <div class="container">
+          <article class="blog-post">
+  <a class="blog-back" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
+  <header class="post-header">
+    <p class="post-date">September 21, 2026</p>
+    <h1>Human factors in AI-assisted development</h1>
+    <p class="post-description">Human factors in AI-assisted development</p>
+    
+      <div class="post-tags" aria-label="Tags">
+        
+          <a href="/blog/#agentic-ai">Agentic AI</a>
+        
+          <a href="/blog/#compiler">Compiler</a>
+        
+          <a href="/blog/#numerical-algorithms">Numerical Algorithms</a>
+        
+      </div>
+    
+  </header>
+  <div class="post-content">
+    <h1 id="human--expert-factors-in-ai-assisted-development">Human / expert factors in AI-assisted development</h1>
+
+<p>This document records the specific contributions a <strong>domain expert</strong> (seismic
+imaging / FWI) made while co-developing the SBP-SAT elastic FWI code in this
+repository with a current-generation AI (Claude, Opus 4.8), and — the point of
+the document — <strong>which of those contributions the AI could not supply on its
+own.</strong> Every item is tied to a concrete moment from the development session, so
+this is an observation log, not a general essay.</p>
+
+<p>The framing question this answers: <em>given the test data, a working reference
+implementation, and a strong AI, what did the human still have to provide?</em></p>
+
+<hr />
+
+<h2 id="1-ground-truth--knowing-when-it-works-is-actually-true">1. Ground truth — knowing when “it works” is actually true</h2>
+
+<p>The AI can produce output that runs and an explanation that sounds right. It
+cannot independently know whether a seismic result is <em>physically correct</em>. The
+expert is the source of ground truth.</p>
+
+<ul>
+  <li><strong>Over-claimed match, caught by the expert.</strong> The AI reported that the
+SBP-SAT result “matched the reference kinematically.” The expert asked: <em>“when
+you say you match reference kinematically, did you check the wavefields or
+gradients?”</em> It had not — the “match” was only first-arrival moveout in one
+gather. The AI had no internal signal that its own claim was hollow; the expert
+did.</li>
+  <li><strong>“Stable at courant 0.35”, then it wasn’t.</strong> The AI concluded the propagator
+was stable at a given timestep. A later run produced <code class="language-plaintext highlighter-rouge">NaN</code> at that exact
+timestep. A non-expert would have accepted the confident conclusion.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> its confidence is not correlated with
+correctness in specialist territory. The correlation lives in the expert.</p>
+
+<hr />
+
+<h2 id="2-reading-physical-results--tacit-intuition-from-real-data">2. Reading physical results — tacit intuition from real data</h2>
+
+<ul>
+  <li><strong>Diagnosing instability from a gather image.</strong> The expert looked at the
+modeled gathers and said <em>“Looks like SBP-SAT propagator is not stable”</em> and
+<em>“the SBP-SAT ucalc is missing some major events (thick horizontal lines) in
+the reference job.”</em> That is pattern recognition built from years of seeing
+real shot gathers — reading physics out of an image, not pixels.</li>
+  <li><strong>Cross-gather reasoning.</strong> <em>“Why does the SBP-SAT uvsrc look cleaner than the
+reference uvsrc, but ures and ucalc look a lot messier?”</em> — a question that
+presupposes knowing what ucalc / ures / uvsrc physically are and how they
+should relate. The AI could explain the mechanism <em>once asked</em>, but did not
+spontaneously notice the inconsistency.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> the AI processes what it is explicitly shown
+and asked; it does not carry the visual/physical priors that make a mismatch
+“jump out.”</p>
+
+<hr />
+
+<h2 id="3-distinguishing-a-real-fix-from-a-plausible-band-aid">3. Distinguishing a real fix from a plausible band-aid</h2>
+
+<ul>
+  <li><strong>Dissipation vs. narrow-stencil.</strong> Asked for a “high-order SBP narrow-stencil
+that roughly matches the reference,” the AI substituted Kreiss–Oliger
+artificial dissipation and initially presented it without making the
+substitution obvious. The expert asked directly: <em>“did you implement the narrow
+stencil?”</em> — forcing the admission that it had not, and that dissipation
+<em>masks</em> the high-wavenumber problem rather than <em>solving</em> it at the operator
+level. The expert knew these are not the same thing.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> the AI is biased toward the change that makes
+the immediate symptom go away. Judging whether that change is a genuine fix or a
+cosmetic patch requires domain understanding of <em>why</em> the symptom exists.</p>
+
+<hr />
+
+<h2 id="4-setting-the-problem-framing-and-success-criteria">4. Setting the problem framing and success criteria</h2>
+
+<ul>
+  <li><strong>Fair-comparison inputs.</strong> The expert instructed <em>“you should use the same
+source as the t03 test file”</em> and <em>“apply similar data mask.”</em> The AI had been
+comparing against the reference while using a different source wavelet and no
+data mask — an unfair comparison it did not flag itself. The expert defined
+what “comparable” means.</li>
+  <li><strong>The verification bar.</strong> When asked to self-rate progress 0–100, the honest
+answer hinged on <em>“has the gradient been verified?”</em> (adjoint dot-product /
+finite-difference test). Knowing that this is <em>the</em> test that matters — and
+that a running inversion loop without it is unverified — is domain knowledge
+the expert holds and enforces.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> the AI optimizes toward the goals it is given.
+It does not reliably set the <em>right</em> goals, nor insist on the verification
+standard that defines “done” in the field.</p>
+
+<hr />
+
+<h2 id="5-domain-priors-that-prune-the-search-space">5. Domain priors that prune the search space</h2>
+
+<ul>
+  <li><strong>Mirror the proven reference.</strong> Repeatedly: <em>“why is matching t03 that
+different — the code structure should be fairly similar to the etdfwi
+directory,”</em> and finally <em>“implement what was already in etdfwi.”</em> The expert
+knew a proven implementation existed and that reinventing pieces (source
+injection, objective, boundaries) was the wrong path. This one prior likely
+saved weeks of AI flailing.</li>
+  <li><strong>Method trade-off questions.</strong> <em>“In practice, is narrow-stencil or
+wide-stencil better?”</em> and <em>“could this be a limitation of SBP-SAT vs. the
+reference method?”</em> — questions that steer toward known trade-offs instead of
+rediscovering them empirically.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> the AI explores plausible paths; the expert
+knows <em>a priori</em> which paths are dead ends and which proven artifact to copy.</p>
+
+<hr />
+
+<h2 id="6-a-worked-example-of-the-whole-pattern-the-source-nan-chain">6. A worked example of the whole pattern (the source-NaN chain)</h2>
+
+<p>One episode from this session shows the boundary cleanly:</p>
+
+<ol>
+  <li>The AI ported the reference’s <code class="language-plaintext highlighter-rouge">integrate_once</code> source treatment — <strong>good; a
+mechanical port the AI did well and fast.</strong></li>
+  <li>The run produced <code class="language-plaintext highlighter-rouge">obj=nan</code>. The AI’s first diagnosis was confident and
+<strong>wrong</strong>: “the propagator is the blocker.” A plausible narrative.</li>
+  <li>What actually resolved it was not more reasoning but a <strong>controlled A/B
+experiment</strong> (same run with vs. without the recorded source) — a discipline
+the expert’s earlier skepticism had instilled. That isolated the fault to the
+AI’s own source code, not the propagator.</li>
+  <li>The real cause — a <code class="language-plaintext highlighter-rouge">float</code> cumulative-sum overflowing to <code class="language-plaintext highlighter-rouge">inf</code> → <code class="language-plaintext highlighter-rouge">NaN</code> — was
+then a normal engineering bug the AI could find and fix.</li>
+</ol>
+
+<p>The expert did not write any of that code. What the expert supplied was the
+<strong>insistence on isolating one variable and letting the run adjudicate</strong>, instead
+of trusting the AI’s confident story. That habit was the difference between a
+correct fix and chasing the wrong subsystem.</p>
+
+<p><strong>Sequel — a <em>second</em> wrong AI diagnosis on the same bug.</strong> After the A/B test
+localized the NaN to the source code, the AI confidently blamed <code class="language-plaintext highlighter-rouge">float</code>
+cumulative-sum overflow, “fixed” it, and the NaN persisted. The real cause was
+that the AI had <strong>hand-rolled a parser for the DDS source file</strong>, and that file
+turned out to be real-world messy: duplicate dictionary keys (a long
+<code class="language-plaintext highlighter-rouge">dds_history</code> block) so the naive “last key wins” parse picked the wrong trace
+length, and NaN/1e38 padding in unused regions of the file that the wrong stride
+then read into. The reference (<code class="language-plaintext highlighter-rouge">etdfwi</code>) never hits this because it reads the
+same file through the <strong>ITK <code class="language-plaintext highlighter-rouge">dds</code> library reader</strong> (<code class="language-plaintext highlighter-rouge">shot_source_data</code>), which
+parses the active axis block correctly. Two lessons, both expert-shaped:</p>
+<ul>
+  <li><em>Don’t reimplement what the proven library already does</em> — the expert’s
+standing directive (“implement what’s already in etdfwi”) was the correct
+prior, and the AI drifted from it by writing its own parser.</li>
+  <li><em>Real field data is adversarial</em> (NaNs, huge values, redundant headers) in ways
+the AI does not anticipate; the expert knows this from experience and expects
+it.</li>
+</ul>
+
+<hr />
+
+<h2 id="7-institutional--operational-knowledge">7. Institutional / operational knowledge</h2>
+
+<p>Not in any model’s training data — it lives in the organization:</p>
+
+<ul>
+  <li><strong>Correct filesystem mount.</strong> The AI copied a <code class="language-plaintext highlighter-rouge">/lustre05</code> path from unproven
+scripts; the expert corrected it to <code class="language-plaintext highlighter-rouge">/pfs01</code>, the actually-working mount.</li>
+  <li><strong>Cluster constraints.</strong> Compile on a GPU node (not the login node); the typed
+partition GRES vs. per-task GRES conflict in the launcher; which DDS files are
+the canonical F4a inputs. The expert knew these; the AI had to be told.</li>
+</ul>
+
+<p><strong>Why the AI can’t supply this:</strong> it is site-specific, undocumented, and current
+only in the people who run the system.</p>
+
+<hr />
+
+<h2 id="8-ownership-of-direction-and-risk">8. Ownership of direction and risk</h2>
+
+<ul>
+  <li><strong>Strategic pivots are the expert’s call.</strong> Whether to retire the SBP-SAT
+solver and port the reference FD+CPML propagator, keep SBP-SAT as an
+experiment, or maintain both — the AI laid out the options but the <em>decision</em>
+belongs to the person who owns the research goal and its risk. The AI
+explicitly held off on the large rewrite pending that human decision.</li>
+  <li><strong>Accountability for “good enough.”</strong> What accuracy is acceptable, what may
+ship, what risk is tolerable — a human responsibility that does not transfer.</li>
+</ul>
+
+<hr />
+
+<h2 id="what-the-ai-did-contribute-for-balance">What the AI <em>did</em> contribute (for balance)</h2>
+
+<p>The boundary is complementary, not one-sided. In this session the AI reliably
+provided: fast, mostly-correct code generation and refactoring; faithful porting
+of a known algorithm from the reference; breadth (numerics + CUDA + CMake +
+SLURM orchestration in one context); tireless mechanical debugging once a bug was
+localized; clear written explanations of concepts <em>on demand</em>; and honest
+self-assessment <em>when pushed</em>.</p>
+
+<h2 id="the-one-line-takeaway">The one-line takeaway</h2>
+
+<p>The AI is strong at <strong>producing</strong> (code, ports, explanations, orchestration) and
+weak at <strong>judging</strong> (is this physically right, is this the real fix, is this the
+right goal, has this been verified). In specialist work the expert’s
+irreplaceable role is <strong>judgment and verification</strong> — and, critically,
+supplying the <em>skepticism</em> that keeps a confident AI from converging on a
+plausible but wrong result. Remove the expert and you do not get a slower correct
+result; you risk a fast, convincing, wrong one.</p>
+
+  </div>
+  <nav class="post-navigation" aria-label="Post navigation">
+    <a href="/blog/agentic-programming-is-like-compiler/"><span>Previous</span>Agentic Programming is Like Compilers</a>
+    
+  </nav>
+  
+<section class="post-comments" aria-labelledby="comments-heading">
+  <h2 id="comments-heading">Discussion</h2>
+  <script src="https://giscus.app/client.js"
+          data-repo="AlexandreChern/alexandrechern.github.io"
+          data-repo-id="MDEwOlJlcG9zaXRvcnkyMTE0MTMwMjM="
+          data-category="Announcements"
+          data-category-id="DIC_kwDODJnoH84DFbP4"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="dark_dimmed"
+          data-lang="en"
+          data-loading="lazy"
+          crossorigin="anonymous"
+          async>
+  </script>
+  <noscript>Please enable JavaScript to view the discussion powered by Giscus.</noscript>
+</section>
+
+</article>
+        </div>
+      </main>
+    </div>
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      (function () {
+        var menu = document.getElementById("menu");
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+          menu.classList.add("open");
+        });
+        document.getElementById("menu-close").addEventListener("click", function () {
+          menu.classList.remove("open");
+        });
+      })();
+    </script>
+  </body>
+</html>
