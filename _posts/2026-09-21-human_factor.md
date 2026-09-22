@@ -5,8 +5,8 @@ description: "Human factors in AI-assisted development"
 permalink: /blog/human-factors/
 tags:
   - Agentic AI
-  - Compiler
-  - Numerical Algorithms
+  - SBP-SAT
+  - Numerical Methods
 math: true
 ---
 
