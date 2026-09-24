@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="SBP-SAT on GPU: closing the Triton–CUDA gap" />
+    <title>SBP-SAT on GPU: closing the Triton–CUDA gap | Alexandre Chern</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" />
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="/assets/css/templatemo-style.css" />
+    
+  </head>
+  <body class="content-page">
+    <div id="page-wraper">
+      <div class="responsive-nav">
+  <i class="fa fa-bars" id="menu-toggle" aria-label="Open navigation"></i>
+  <div id="menu" class="menu">
+    <i class="fa fa-times" id="menu-close" aria-label="Close navigation"></i>
+    <div class="container">
+      <div class="image">
+        <a href="/">
+          <img src="/assets/images/alexandre_chern.jpg" alt="Alexandre Chern" />
+        </a>
+      </div>
+      <div class="author-content">
+        <h4>Alexandre Chern</h4>
+        <span>PhD in Computer Science <br /> Computational Scientist</span>
+      </div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul class="main-menu">
+          <li><a href="/about/#section1">About Me</a></li>
+          <li><a href="/about/#section2">Research Interests</a></li>
+          <li><a href="/about/#section3">My Work</a></li>
+          <li class="active">
+            <a href="/blog/">Blog</a>
+          </li>
+          <li>
+            <a href="/datasets/">Datasets</a>
+          </li>
+          <li><a href="/about/#section5">Contact Me</a></li>
+        </ul>
+      </nav>
+      <div class="social-network">
+        <ul class="soial-icons">
+          <li><a href="https://www.facebook.com/ymchern" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+          <li><a href="https://www.linkedin.com/in/alexandre-c-81a31490/" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a></li>
+          <li><a href="https://www.instagram.com/ym.chern/" aria-label="Instagram"><i class="fa fa-instagram"></i></a></li>
+        </ul>
+      </div>
+      <div class="copyright-text"><p>Copyright 2026 Alexandre Chern</p></div>
+    </div>
+  </div>
+</div>
+      <main class="section content-section">
+        <div class="container">
+          <article class="blog-post">
+  <a class="blog-back" href="/blog/"><i class="fa fa-arrow-left" aria-hidden="true"></i> All posts</a>
+  <header class="post-header">
+    <p class="post-date">September 24, 2026</p>
+    <h1>SBP-SAT on GPU: closing the Triton–CUDA gap</h1>
+    <p class="post-description">SBP-SAT on GPU: closing the Triton–CUDA gap</p>
+    
+      <div class="post-tags" aria-label="Tags">
+        
+          <a href="/blog/#triton">Triton</a>
+        
+          <a href="/blog/#cuda">CUDA</a>
+        
+          <a href="/blog/#sbp-sat">SBP-SAT</a>
+        
+          <a href="/blog/#numerical-methods">Numerical Methods</a>
+        
+      </div>
+    
+  </header>
+  <div class="post-content">
+    <h1 id="sbp-sat-on-gpu-closing-the-tritoncuda-gap">SBP-SAT on GPU: closing the Triton–CUDA gap</h1>
+
+<p>How a masked, branchy Triton kernel ran at 36% of hand-tuned CUDA — and how
+restructuring the algorithm (not tuning the kernel) got it to 68%, at the
+STREAM roofline. 2D Poisson, 4th-order SBP + SAT, n=1025 in fp64, Tesla T4.</p>
+
+<h2 id="the-setup">The setup</h2>
+
+<p>The operator is a 2D Laplacian discretized with 4th-order summation-by-parts
+(SBP) finite differences in the interior, one-sided boundary closures, and
+simultaneous approximation terms (SAT) imposing Dirichlet boundaries weakly.
+Diagonal norm, 1.05M unknowns, fp64. The hot loop is the sparse matvec
+<code class="language-plaintext highlighter-rouge">y = A x</code> — a GMRES solve needs dozens of them.</p>
+
+<p>Three implementations of the same matvec:</p>
+
+<ul>
+  <li><strong>Triton v1</strong> — one kernel, masked loads/stores, runtime branches selecting
+the stencil per grid point.</li>
+  <li><strong>Triton v2</strong> — nine kernels over disjoint write-sets (below).</li>
+  <li><strong>CUDA</strong> — hand-written: tiled shared-memory and direct global-memory
+variants, CUDA-event timed.</li>
+</ul>
+
+<p>Metric: wall-clock ms per matvec, plus effective GB/s against the STREAM
+roofline (244.6 GB/s on this T4).</p>
+
+<h2 id="v1-the-gap">v1: the gap</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>kernel</th>
+      <th>Triton</th>
+      <th>CUDA</th>
+      <th>Triton/CUDA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>copy</td>
+      <td>0.088 ms</td>
+      <td>0.069 ms</td>
+      <td>78%</td>
+    </tr>
+    <tr>
+      <td>stencil5</td>
+      <td>0.185 ms</td>
+      <td>0.110 ms</td>
+      <td>60%</td>
+    </tr>
+    <tr>
+      <td><strong>sbp_full</strong></td>
+      <td><strong>0.669 ms</strong></td>
+      <td><strong>0.236 ms</strong></td>
+      <td><strong>36%</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The more complex the kernel, the worse Triton did. That’s the signature of a
+codegen problem, not a hardware problem.</p>
+
+<p><img src="/assets/images/blog/sbp-sat-on-gpu/ladder.png" alt="v1 benchmark ladder: Triton vs CUDA across copy, stencil5, sbp_full" /></p>
+
+<h2 id="autopsy-why-v1-was-slow">Autopsy: why v1 was slow</h2>
+
+<p>I dumped the SASS for the v1 kernel. Out of 2,760 instructions, only 201 were
+DFMA — <strong>7.3% of the instruction stream did real arithmetic</strong>:</p>
+
+<ul>
+  <li>184 of 377 global loads were predicated (masked);</li>
+  <li>354 FSEL plus select scaffolding (27.8%) existed only to emulate masked
+loads;</li>
+  <li>152 registers per thread → 384 threads/SM → <strong>18.75% occupancy</strong>;</li>
+  <li>zero vectorized memory accesses.</li>
+</ul>
+
+<p><img src="/assets/images/blog/sbp-sat-on-gpu/codegen.png" alt="SASS breakdown of Triton v1: instruction mix and occupancy" /></p>
+
+<p>Root cause: the masked, always-execute-both-paths structure. Every thread
+loaded both the interior and boundary stencil paths and selected afterward.
+No compiler flag fixes an algorithm shaped like this.</p>
+
+<h2 id="v2-restructure-dont-tune">v2: restructure, don’t tune</h2>
+
+<p>The fix was to change what each thread <em>writes</em>, not how it computes. The grid
+is partitioned into 9 disjoint write-sets: one branch-free interior kernel
+(<code class="language-plaintext highlighter-rouge">i,j ∈ [4, n−5]</code>, pure 5-point stencil, zero masked loads) plus 8 boundary
+rectangles. The stencil structure in each rectangle is chosen by <strong>compile-time
+constexprs</strong> — the generated code for each part is a straight-line sequence
+with no runtime branches and no masked loads.</p>
+
+<p>This also settled a real correctness hazard: the SAT penalty touches corner
+points from two sides, so a naive split would have two threads racing on the
+same grid point. Here every point has exactly one writer thread — the corner’s
+double SAT term is added locally by its owning thread. Race-free by
+construction, not by synchronization.</p>
+
+<p><img src="/assets/images/blog/sbp-sat-on-gpu/partition.png" alt="The 9-part write-set partition at n=33; rings mark the double-SAT corners" /></p>
+
+<p>Verification before benchmarking: the split algorithm matches the assembled
+sparse matrix to ~3e-16 on CPU, and the compiled PTX shows zero predicated
+loads and zero fp32 ops.</p>
+
+<h2 id="rematch-verdict">Rematch verdict</h2>
+
+<p>Correctness on the T4: <strong>1.639e-16</strong> vs a torch fp64 reference. Then:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>kernel</th>
+      <th>ms</th>
+      <th>effective GB/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>copy</td>
+      <td>0.0887</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>sbp_interior (BLOCK=128, 4 warps)</td>
+      <td>0.2968</td>
+      <td>278.7</td>
+    </tr>
+    <tr>
+      <td>sbp_boundary (8 parts)</td>
+      <td>0.1896</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><strong>sbp_full (v2)</strong></td>
+      <td><strong>0.3499</strong></td>
+      <td><strong>241.3</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>That’s <strong>1.91× faster than v1</strong> (0.669 ms), now within <strong>1.48× of hand-tuned
+CUDA tiled</strong> (0.236 ms) — and the effective bandwidth sits at the STREAM
+roofline. The remaining gap is memory reuse (CUDA’s shared-memory tiling),
+not instruction overhead.</p>
+
+<p>One war story: the first rematch run <em>failed</em> — the fail-fast assert tripped
+at 1.7e-08 instead of ~1e-16. The algorithm was proven correct on CPU, so it
+wasn’t a math bug: Colab’s triton 3.6.0 was silently demoting <code class="language-plaintext highlighter-rouge">np.float64</code>
+scalar kernel arguments to fp32 (my clean check had run on 3.8.0 — a
+version-specific behavior). The fix: constants now ride in a device fp64
+tensor that the kernels load directly. Unambiguous on every triton version.
+This is why you assert numerics <em>before</em> you benchmark.</p>
+
+<h2 id="whats-left">What’s left</h2>
+
+<ul>
+  <li>Fuse the 8 boundary launches (they’re launch-bound); try a single persistent
+kernel with constexpr dispatch.</li>
+  <li>Per-part <code class="language-plaintext highlighter-rouge">num_warps</code> autotuning.</li>
+  <li>Re-measure on A100/H100, where occupancy and shared memory matter more.</li>
+</ul>
+
+<h2 id="takeaways">Takeaways</h2>
+
+<ol>
+  <li><strong>Masked always-execute-both-paths is the #1 Triton perf killer.</strong>
+Restructure the algorithm; don’t tune the kernel.</li>
+  <li><strong>Compile-time specialization</strong> (<code class="language-plaintext highlighter-rouge">constexpr</code>) turns runtime branches into
+separate clean code paths — free performance the compiler can’t infer.</li>
+  <li><strong>Assert numerics before benchmarking.</strong> A fail-fast check caught a
+version-specific fp32 demotion that looked exactly like a math bug.</li>
+  <li>Roofline-effective bandwidth is achievable in Triton. The remaining gap to
+CUDA is memory reuse (shared memory), not instruction overhead.</li>
+</ol>
+
+<p><em>All numbers measured on a Tesla T4 via Google Colab, 2026-09-24.</em></p>
+
+  </div>
+  <nav class="post-navigation" aria-label="Post navigation">
+    <a href="/blog/human-factors/"><span>Previous</span>Human factors in AI-assisted development</a>
+    
+  </nav>
+  
+<section class="post-comments" aria-labelledby="comments-heading">
+  <h2 id="comments-heading">Discussion</h2>
+  <script src="https://giscus.app/client.js"
+          data-repo="AlexandreChern/alexandrechern.github.io"
+          data-repo-id="MDEwOlJlcG9zaXRvcnkyMTE0MTMwMjM="
+          data-category="Announcements"
+          data-category-id="DIC_kwDODJnoH84DFbP4"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="dark_dimmed"
+          data-lang="en"
+          data-loading="lazy"
+          crossorigin="anonymous"
+          async>
+  </script>
+  <noscript>Please enable JavaScript to view the discussion powered by Giscus.</noscript>
+</section>
+
+</article>
+        </div>
+      </main>
+    </div>
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      (function () {
+        var menu = document.getElementById("menu");
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+          menu.classList.add("open");
+        });
+        document.getElementById("menu-close").addEventListener("click", function () {
+          menu.classList.remove("open");
+        });
+      })();
+    </script>
+  </body>
+</html>
